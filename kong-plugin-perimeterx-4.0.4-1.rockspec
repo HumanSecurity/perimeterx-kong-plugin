@@ -1,11 +1,11 @@
 package = "kong-plugin-perimeterx"
 
-version = "4.0.3-1"
+version = "4.0.4-1"
 
 supported_platforms = {"linux", "macosx"}
 source = {
     url = "git://github.com/PerimeterX/perimeterx-kong-plugin.git",
-    tag = "v4.0.3"
+    tag = "v4.0.4"
 }
 
 description = {
