@@ -446,24 +446,41 @@ end
 
 ### <a name="custom-parameters"> Enrich Custom Parameters
 
-Adding an Enrich Custom Parameters function is done by setting `enrich_custom_params` property with an user defined function. With the `enrich_custom_params` function you can add up to 10 custom parameters to be sent back to PerimeterX servers. When set, the function is called before setting the payload on every request to PerimeterX servers. The parameters should be passed according to the correct order (1-10).
+Adding an Enrich Custom Parameters function is done by setting `enrich_custom_params` property with an user defined anonymous function. With the `enrich_custom_params` function you can add up to 10 custom parameters to be sent back to PerimeterX servers. When set, the function is called before setting the payload on every request to PerimeterX servers. The parameters should be passed according to the correct order (1-10).
 You must return the `px_custom_params` object at the end of the function.
-Because of technical limitations of the Kong platform, you can't set this function using the admin API. Instead, you need to edit the PerimeterX plugin's `handler.lua`
 
 Default: nil
 
 ```lua
-function enrich_custom_parameters(px_custom_params)
-    -- here we have an access to `ngx` object.
-    -- e.g.: ngx.req.get_headers()["x-user-id"]
-    px_custom_params["custom_param1"] = "user_id"
-    return px_custom_params
-end
+plugins:
+    - name: perimeterx
+      config:
+          ...
+          enrich_custom_parameters:
+              - |
+                  -- Must return an anonymous function that accepts a table as an argument
+                  return function(px_custom_params)
+                  -- custom_params is a table you can add values to.
 
-function PXHandler:init_worker(config)
-    ...
-    config.enrich_custom_parameters = enrich_custom_parameters
-end
+                  -- custom_param 1: Add a static value
+                  px_custom_params["custom_param1"] = "gold"
+
+                  -- custom_param 2: Add a value from the request headers
+                  local user_id = kong.request.get_header("X-User-ID")
+                  if user_id then
+                      px_custom_params["custom_param2"] = user_id
+                  end
+
+                  -- custom_param 3: Add the consumer's username if available
+                  local consumer = kong.client.get_consumer()
+                  if consumer and consumer.username then
+                      px_custom_params["custom_param3"] = consumer.username
+                  end
+
+                  -- return the updated px_custom_params table
+                  return px_custom_params
+                  end
+
 
 ```
 

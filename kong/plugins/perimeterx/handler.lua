@@ -21,14 +21,6 @@ local PXHandler = {
 --	end
 --end
 
--- Example: enrich_custom_parameters() function
---function enrich_custom_parameters(px_custom_params)
-    -- here we have an access to `ngx` object.
-    -- e.g.: ngx.req.get_headers()["x-user-id"]
---    px_custom_params["custom_param1"] = "user_id"
---    return px_custom_params
---end
-
 
 local function get_now()
     return ngx_now() * 1000
@@ -42,8 +34,23 @@ end
 function PXHandler:access(config)
     local ngx_ctx = ngx.ctx
     ngx_ctx.KONG_HEADER_FILTER_STARTED_AT = get_now()
-    config.additional_activity_handler = additional_activity_handler
-    config.enrich_custom_parameters = enrich_custom_parameters
+
+    -- config.additional_activity_handler = additional_activity_handler
+
+    if config.enrich_custom_parameters ~= nil then
+        local code_string = table.concat(config.enrich_custom_parameters, "\n")
+
+        local dynamic_function, err = load(code_string)
+
+        if dynamic_function then
+            config.enrich_custom_parameters = dynamic_function()
+        else
+            ngx.log(ngx.ERR, "[PerimeterX - ERROR]: Failed to load `enrich_custom_parameters` function: " .. tostring(err))
+            config.enrich_custom_parameters = nil
+        end
+
+    end
+
     px.application(config)
 end
 
