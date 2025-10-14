@@ -39,6 +39,8 @@ return {
         { bypass_monitor_header = {type = "string"} },
         -- pxhd_secure_enabled
 
+        { enrich_custom_parameters = {type = "array", elements = { type = "string" }, default = {}} },
+
         -- ## API protection mode ##
         { api_protection_mode = {type = "boolean", default = false} },
         { api_protection_block_url = {type = "string"} },

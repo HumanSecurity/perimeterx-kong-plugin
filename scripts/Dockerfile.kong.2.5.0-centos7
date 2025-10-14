@@ -1,0 +1,47 @@
+FROM kong:2.5.0-centos
+USER root
+
+RUN sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+RUN sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+RUN sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+RUN  yum update -y
+RUN yum install -y epel-release
+RUN yum update -y
+RUN  yum install -y wget make pkgconfig ca-certificates build-essential gcc lua-devel m4
+
+RUN  cd /tmp/ && wget https://luarocks.github.io/luarocks/releases/luarocks-3.12.2.tar.gz && \
+    tar -xzf luarocks-3.12.2.tar.gz && \
+    cd luarocks-3.12.2 && \
+    ./configure --with-lua-include=/usr/include && \
+    make install
+
+RUN cd /tmp/ && \
+    wget https://ftp.gnu.org/gnu/nettle/nettle-3.10.tar.gz && \
+    tar -xzf nettle-3.10.tar.gz && \
+    cd nettle-3.10 && \
+    ./configure --prefix=/usr  && \
+    make install
+
+
+COPY kong/config/kong.dev.yml /etc/kong/kong.yml
+COPY scripts/kong.conf.default /etc/kong/kong.conf
+
+
+
+### install local Kong plugin
+#RUN luarocks install perimeterx-nginx-plugin
+#RUN ln -s /usr/local/lib/lua/px /usr/local/share/lua/5.1/px
+#COPY . /tmp/perimeterx-kong-plugin
+#RUN cd /tmp/perimeterx-kong-plugin && luarocks make
+
+### install from repo
+RUN luarocks install --lua-version 5.1 kong-plugin-perimeterx
+
+
+EXPOSE 8000 8443 8001 8444
+
+USER kong
+ENTRYPOINT ["/docker-entrypoint.sh"]
+STOPSIGNAL SIGQUIT
+
+CMD ["kong", "docker-start"]
