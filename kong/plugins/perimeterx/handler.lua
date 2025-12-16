@@ -2,7 +2,7 @@ local pxconfig = require("px.pxconfig")
 local pxtimer = require("px.utils.pxtimer")
 local pxconstants = require("px.utils.pxconstants")
 local px = require("px.pxnginx")
-local MODULE_VERSION = "4.0.4"
+local MODULE_VERSION = "4.0.5"
 local MODULE_VERSION_FULL = "Kong Plugin v" .. MODULE_VERSION
 local ngx_now = ngx.now
 

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.5] - 2025-12-16
+
+### Fixed
+
+- Copy enrich_custom_parameters before concatenate, to prevent config object mutation
+
 ## [4.0.4] - 2025-10-14
 
 ### Added
@@ -79,13 +85,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [3.0.0] - 2021-02-22
 
-### Fixes
+### Fixed
 
 - Support for Kong 1.x and 2.x
 
 ## [2.0.1] - 2019-03-31
 
-### Fixes
+### Fixed
 
 - Removed validation for custom_block_url and whitelist_uri_full
 
