@@ -2,7 +2,7 @@ local pxconfig = require("px.pxconfig")
 local pxtimer = require("px.utils.pxtimer")
 local pxconstants = require("px.utils.pxconstants")
 local px = require("px.pxnginx")
-local MODULE_VERSION = "4.0.4"
+local MODULE_VERSION = "4.0.5"
 local MODULE_VERSION_FULL = "Kong Plugin v" .. MODULE_VERSION
 local ngx_now = ngx.now
 
@@ -37,8 +37,9 @@ function PXHandler:access(config)
 
     -- config.additional_activity_handler = additional_activity_handler
 
-    if config.enrich_custom_parameters ~= nil then
-        local code_string = table.concat(config.enrich_custom_parameters, "\n")
+    local params = config.enrich_custom_parameters
+    if params ~= nil and type(params) == "table" then
+        local code_string = table.concat(params, "\n")
 
         local dynamic_function, err = load(code_string)
 
