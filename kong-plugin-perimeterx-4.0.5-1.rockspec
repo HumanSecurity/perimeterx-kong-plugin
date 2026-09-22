@@ -15,7 +15,7 @@ description = {
 }
 
 dependencies = {
-    "perimeterx-nginx-plugin == 7.3.5"
+    "perimeterx-nginx-plugin == 7.3.6"
 }
 
 local pluginName = "perimeterx"
