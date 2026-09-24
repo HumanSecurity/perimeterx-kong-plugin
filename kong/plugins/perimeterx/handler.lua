@@ -1,7 +1,7 @@
 local pxtimer = require("px.utils.pxtimer")
 local pxconstants = require("px.utils.pxconstants")
 local px = require("px.pxnginx")
-local MODULE_VERSION = "4.0.5"
+local MODULE_VERSION = "4.0.6"
 local MODULE_VERSION_FULL = "Kong Plugin v" .. MODULE_VERSION
 local ngx_now = ngx.now
 local timer_started = false
