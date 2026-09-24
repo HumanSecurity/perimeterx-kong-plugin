@@ -1,10 +1,10 @@
-local pxconfig = require("px.pxconfig")
 local pxtimer = require("px.utils.pxtimer")
 local pxconstants = require("px.utils.pxconstants")
 local px = require("px.pxnginx")
-local MODULE_VERSION = "4.0.5"
+local MODULE_VERSION = "4.0.6"
 local MODULE_VERSION_FULL = "Kong Plugin v" .. MODULE_VERSION
 local ngx_now = ngx.now
+local timer_started = false
 
 local PXHandler = {
     VERSION = MODULE_VERSION,
@@ -26,9 +26,42 @@ local function get_now()
     return ngx_now() * 1000
 end
 
+local function copy_config(config)
+    local copy = {}
+    for k, v in pairs(config) do
+        copy[k] = v
+    end
+
+    if type(copy.enrich_custom_parameters) ~= "function" then
+        copy.enrich_custom_parameters = nil
+    end
+    return copy
+end
+
+function PXHandler:configure(configs)
+    if timer_started or not configs then
+        return
+    end
+
+    local selected
+    for _, config in ipairs(configs) do
+        if not config.route_id and not config.service_id and not config.consumer_id then
+            selected = config
+            break
+        end
+    end
+    selected = selected or configs[1]
+    if not selected then
+        return
+    end
+
+    timer_started = true
+    pxconstants.MODULE_VERSION = MODULE_VERSION_FULL
+    pxtimer.application(copy_config(selected))
+end
+
 function PXHandler:init_worker()
-     pxconstants.MODULE_VERSION = MODULE_VERSION_FULL
-     pxtimer.application(pxconfig)
+    pxconstants.MODULE_VERSION = MODULE_VERSION_FULL
 end
 
 function PXHandler:access(config)
